@@ -8,7 +8,7 @@ import (
 
 var (
 	ErrEmailAlreadyTaken   = errors.New("the email is already taken")
-	ErrInvalidEmailAddress = errors.New("the email address does not exist")
+	ErrInvalidEmailAddress = errors.New("invalid email id")
 	ErrInvalidPassword     = errors.New("invalid password")
 )
 
@@ -16,11 +16,11 @@ var (
 type User struct {
 	ID        uint      `json:"id" gorm:"primarykey"`
 	Email     string    `json:"email" gorm:"unique"`
-	FirstName string    `json:"firstName" gorm:"size:191"`
-	LastName  string    `json:"lastName" gorm:"size:191"`
+	FirstName string    `json:"first_name" gorm:"size:191"`
+	LastName  string    `json:"last_name" gorm:"size:191"`
 	Password  string    `json:"-" gorm:"size:255"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 // NewUser creates a new user
@@ -46,5 +46,5 @@ type UserService interface {
 	// CreateUser creates a new user in the system.
 	CreateUser(ctx context.Context, email, firstName, lastName, plaintextPassword string) error
 	// Authenticate verifies the credentials and returns the associated user if they match.
-	Authenticate(ctx context.Context, email, password string) (error, *User)
+	Authenticate(ctx context.Context, email, password string) (*User, error)
 }

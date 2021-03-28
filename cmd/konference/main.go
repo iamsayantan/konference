@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	dsn := "root:12345@tcp(127.0.0.1:3306)/konference?charset=utf8mb4"
+	dsn := "root:12345@tcp(127.0.0.1:3306)/konference?charset=utf8mb4&parseTime=true"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(fmt.Sprintf("Could not connect to the database: %s", err.Error()))

@@ -11,6 +11,7 @@ type Response struct {
 	Message    string      `json:"message"`
 	ErrorCode  string      `json:"error_code,omitempty"`
 	Data       interface{} `json:"data,omitempty"`
+	Errors     interface{} `json:"errors,omitempty"`
 }
 
 func RenderSuccess(w http.ResponseWriter, r *http.Request, message string, statusCode int) {
@@ -37,6 +38,17 @@ func RenderError(w http.ResponseWriter, r *http.Request, message, errorCode stri
 		StatusCode: statusCode,
 		Message:    message,
 		ErrorCode:  errorCode,
+	}
+
+	renderJSON(w, r, statusCode, resp)
+}
+
+func RenderErrorsWithData(w http.ResponseWriter, r *http.Request, message, errorCode string, statusCode int, errorData interface{}) {
+	resp := Response{
+		StatusCode: statusCode,
+		Message:    message,
+		ErrorCode:  errorCode,
+		Errors:     errorData,
 	}
 
 	renderJSON(w, r, statusCode, resp)

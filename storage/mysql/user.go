@@ -38,7 +38,12 @@ func (u *userRepo) FindByEmail(ctx context.Context, email string) (*konference.U
 
 func (u *userRepo) findByField(ctx context.Context, fieldName string, fieldValue interface{}) (*konference.User, error) {
 	var user konference.User
-	if err := u.db.WithContext(ctx).Where(fmt.Sprintf("%s = ?", fieldName), fieldValue).First(&user).Error; err != nil {
+	err := u.db.WithContext(ctx).Where(fmt.Sprintf("%s = ?", fieldName), fieldValue).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 

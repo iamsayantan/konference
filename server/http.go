@@ -62,9 +62,9 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	rendering.RenderError(w, r, "the requested route does not exist in our server", "not_found", http.StatusNotFound)
+	rendering.RenderError(w, r, "the requested route does not exist in our server", "route.not_found", http.StatusNotFound)
 }
 
 func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
-	rendering.RenderError(w, r, "the requested method is not supported for the given route", "method_not_allowed", http.StatusMethodNotAllowed)
+	rendering.RenderError(w, r, "the requested method is not supported for the given route", "route.method_not_allowed", http.StatusMethodNotAllowed)
 }

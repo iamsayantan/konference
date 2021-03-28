@@ -33,20 +33,20 @@ func (us *userService) CreateUser(ctx context.Context, email, firstName, lastNam
 	return us.users.Store(ctx, user)
 }
 
-func (us *userService) Authenticate(ctx context.Context, email, plaintextPassword string) (error, *konference.User) {
+func (us *userService) Authenticate(ctx context.Context, email, plaintextPassword string) (*konference.User, error) {
 	user, err := us.users.FindByEmail(ctx, email)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	if user == nil {
-		return konference.ErrInvalidEmailAddress, nil
+		return nil, konference.ErrInvalidEmailAddress
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(plaintextPassword))
 	if err != nil {
-		return konference.ErrInvalidPassword, nil
+		return nil, konference.ErrInvalidPassword
 	}
 
-	return nil, user
+	return user, nil
 }
