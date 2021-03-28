@@ -2,10 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/iamsayantan/konference/server"
+	"github.com/iamsayantan/konference/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
+	"net/http"
 
 	"github.com/iamsayantan/konference"
+	mysqlSotrage "github.com/iamsayantan/konference/storage/mysql"
 )
 
 func main() {
@@ -17,15 +22,12 @@ func main() {
 
 	err = db.AutoMigrate(&konference.User{})
 
-	user := konference.NewUser(
-		"sayantan.das@codelogicx.com",
-		"Sayantan",
-		"Das",
-		"sayantan94",
-	)
+	userRepo := mysqlSotrage.NewUserRepository(db)
+	userService := user.NewUserService(userRepo)
 
-	room := konference.NewRoom(user)
-	fmt.Printf("created invite code: %s, current members: %d\n", room.InviteCode, room.MemberCount())
-	room.RefreshInviteCode()
-	fmt.Printf("updated invite code: %s\n", room.InviteCode)
+	s := server.NewServer(userService)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", "8000"), s)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("error starting the server: %s", err.Error()))
+	}
 }

@@ -2,7 +2,14 @@ package konference
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrEmailAlreadyTaken   = errors.New("the email is already taken")
+	ErrInvalidEmailAddress = errors.New("the email address does not exist")
+	ErrInvalidPassword     = errors.New("invalid password")
 )
 
 // User type represents the User domain in the system.
@@ -34,7 +41,10 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
 }
 
+// UserService defines the domain service methods for User domain.
 type UserService interface {
-	CreateUser(ctx context.Context, u *User) error
+	// CreateUser creates a new user in the system.
+	CreateUser(ctx context.Context, email, firstName, lastName, plaintextPassword string) error
+	// Authenticate verifies the credentials and returns the associated user if they match.
 	Authenticate(ctx context.Context, email, password string) (error, *User)
 }
