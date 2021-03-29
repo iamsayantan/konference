@@ -10,6 +10,8 @@ import (
 	"net/http"
 )
 
+var jwtSigningKey = []byte("kashlasdfasdhflashflaskjvalshferhawoeuriaskjlmcuiryewi")
+
 type Server struct {
 	UserService konference.UserService
 

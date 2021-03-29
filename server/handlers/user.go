@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/iamsayantan/konference/config"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/iamsayantan/konference"
@@ -65,9 +68,31 @@ func (u *userHandler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := struct {
-		User konference.User `json:"user"`
-	}{User: *user}
+	jwtExpirationTime := time.Now().Add(time.Hour * 24)
+	jwtClaims := dto.UserClaims{
+		Email: user.Email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: jwtExpirationTime.Unix(),
+		},
+	}
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
+	accessToken, err := jwtToken.SignedString([]byte(config.AppSecret))
+	if err != nil {
+		rendering.RenderError(w, r, err.Error(), "user.login.jwt_generation", http.StatusInternalServerError)
+		return
+	}
+
+	sessionCookie := http.Cookie{
+		Name:     "konference-token",
+		Value:    accessToken,
+		Path:     "/",
+		Expires:  jwtExpirationTime,
+		HttpOnly: true,
+		Secure:   true,
+	}
+	http.SetCookie(w, &sessionCookie)
+	resp := dto.LoginResponse{User: *user, AccessToken: accessToken}
 	rendering.RenderSuccessWithData(w, r, "login successful", http.StatusOK, resp)
 }
 

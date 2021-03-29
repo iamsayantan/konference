@@ -1,7 +1,9 @@
 package dto
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-playground/validator/v10"
+	"github.com/iamsayantan/konference"
 )
 
 type RegistrationRequest struct {
@@ -34,4 +36,15 @@ func (lr *LoginRequest) Validate() map[string]string {
 
 	validationErrors := err.(validator.ValidationErrors)
 	return translateErrors(validationErrors)
+}
+
+type LoginResponse struct {
+	User        konference.User `json:"user"`
+	AccessToken string          `json:"access_token"`
+}
+
+// UserClaims struct holds the data that would be encoded to a jwt.
+type UserClaims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
 }
