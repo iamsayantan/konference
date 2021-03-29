@@ -45,6 +45,6 @@ type LoginResponse struct {
 
 // UserClaims struct holds the data that would be encoded to a jwt.
 type UserClaims struct {
-	Email string `json:"email"`
+	UserID uint `json:"user_id"`
 	jwt.StandardClaims
 }

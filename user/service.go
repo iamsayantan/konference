@@ -50,3 +50,16 @@ func (us *userService) Authenticate(ctx context.Context, email, plaintextPasswor
 
 	return user, nil
 }
+
+func (us *userService) GetUserDetails(ctx context.Context, userId uint) (*konference.User, error) {
+	user, err := us.users.FindById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, konference.ErrUserNotFound
+	}
+
+	return user, nil
+}

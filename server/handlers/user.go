@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/iamsayantan/konference/config"
+	"github.com/iamsayantan/konference/server/middlewares"
 	"net/http"
 	"time"
 
@@ -22,6 +23,11 @@ func (u *userHandler) Routes() chi.Router {
 	r.Post("/login", u.login)
 	r.Post("/register", u.register)
 
+	// Routes that require authentication is grouped here.
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.AuthChecker)
+		r.Get("/me", u.me)
+	})
 	return r
 }
 
@@ -70,7 +76,7 @@ func (u *userHandler) login(w http.ResponseWriter, r *http.Request) {
 
 	jwtExpirationTime := time.Now().Add(time.Hour * 24)
 	jwtClaims := dto.UserClaims{
-		Email: user.Email,
+		UserID: user.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: jwtExpirationTime.Unix(),
 		},
@@ -84,7 +90,7 @@ func (u *userHandler) login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionCookie := http.Cookie{
-		Name:     "konference-token",
+		Name:     "konference-auth",
 		Value:    accessToken,
 		Path:     "/",
 		Expires:  jwtExpirationTime,
@@ -94,6 +100,22 @@ func (u *userHandler) login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &sessionCookie)
 	resp := dto.LoginResponse{User: *user, AccessToken: accessToken}
 	rendering.RenderSuccessWithData(w, r, "login successful", http.StatusOK, resp)
+}
+
+func (u *userHandler) me(w http.ResponseWriter, r *http.Request) {
+	loggedInUserID, _ := r.Context().Value(middlewares.KeyAuthUserID).(uint)
+	user, err := u.service.GetUserDetails(r.Context(), loggedInUserID)
+
+	if err != nil {
+		rendering.RenderError(w, r, err.Error(), "user.me.user_details", http.StatusBadRequest)
+		return
+	}
+
+	resp := struct {
+		User konference.User `json:"user"`
+	}{User: *user}
+
+	rendering.RenderSuccessWithData(w, r, "success", http.StatusOK, resp)
 }
 
 func NewUserHandler(us konference.UserService) Handler {

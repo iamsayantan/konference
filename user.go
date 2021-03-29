@@ -10,6 +10,7 @@ var (
 	ErrEmailAlreadyTaken   = errors.New("the email is already taken")
 	ErrInvalidEmailAddress = errors.New("invalid email id")
 	ErrInvalidPassword     = errors.New("invalid password")
+	ErrUserNotFound        = errors.New("user not found")
 )
 
 // User type represents the User domain in the system.
@@ -47,4 +48,6 @@ type UserService interface {
 	CreateUser(ctx context.Context, email, firstName, lastName, plaintextPassword string) error
 	// Authenticate verifies the credentials and returns the associated user if they match.
 	Authenticate(ctx context.Context, email, password string) (*User, error)
+	// GetUserDetails returns the details of the user
+	GetUserDetails(ctx context.Context, userId uint) (*User, error)
 }
