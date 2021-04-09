@@ -5,7 +5,7 @@
     align-center
   >
     <div style="margin-top: 20px; width: 90%">
-      <v-form @submit="handleLogin">
+      <v-form @submit.prevent="handleLogin">
         <v-text-field
           v-model="loginRequest.email"
           outlined
