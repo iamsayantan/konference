@@ -10,10 +10,9 @@ import (
 	"net/http"
 )
 
-var jwtSigningKey = []byte("kashlasdfasdhflashflaskjvalshferhawoeuriaskjlmcuiryewi")
-
 type Server struct {
 	UserService konference.UserService
+	RoomService konference.RoomService
 
 	router chi.Router
 }
@@ -22,9 +21,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func NewServer(us konference.UserService) *Server {
+func NewServer(us konference.UserService, rs konference.RoomService) *Server {
 	s := &Server{
 		UserService: us,
+		RoomService: rs,
 	}
 
 	corsHandler := cors.New(cors.Options{

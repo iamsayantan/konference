@@ -24,7 +24,7 @@ var (
 // generateInviteCode generates a random invite code for rooms.
 func generateInviteCode(blockLength int) string {
 	rand.Seed(time.Now().UnixNano())
-	// expected format 9999-3343-3439
+	// format 9999-3343-3439
 	return strconv.Itoa(rand.Intn(blockLength)) + "-" + strconv.Itoa(rand.Intn(blockLength)) + "-" + strconv.Itoa(rand.Intn(blockLength))
 }
 
@@ -32,33 +32,23 @@ func generateInviteCode(blockLength int) string {
 type Room struct {
 	ID         uint   `json:"id"`
 	InviteCode string `json:"inviteCode"`
-	CreatedBy  *User  `json:"createdBy"`
+	OwnerID    uint
+	CreatedBy  *User `json:"createdBy" gorm:"foreignKey:OwnerID"`
 
 	members map[uint]*User
 	mu      sync.Mutex
 }
 
-// WaitingRoom is the place where users are added when they want to join a room.
-// After someone approves the user they would be moved as the room member.
-type WaitingRoom struct {
-	ID   uint  `json:"id"`
-	Room *Room `json:"room"`
-
-	waitingMembers map[uint]*User
-	mu             sync.Mutex
-}
-
-// NewRoom creates a new Room. The owner will be automatically added after the room
-// is created. The invitation code is also generated here.
+// NewRoom creates a new Room. The invitation code is also generated here.
 func NewRoom(owner *User) *Room {
 	room := &Room{
 		InviteCode: generateInviteCode(invitationCodeBlockLength),
+		OwnerID:    owner.ID,
 		CreatedBy:  owner,
 
 		members: make(map[uint]*User, 0),
 	}
 
-	_ = room.AddMember(owner)
 	return room
 }
 
@@ -81,11 +71,6 @@ func (r *Room) IsFull() bool {
 	return r.MemberCount() >= MaxAllowedMembers
 }
 
-// RefreshInviteCode updates the current invitation code.
-func (r *Room) RefreshInviteCode() {
-	r.InviteCode = generateInviteCode(invitationCodeBlockLength)
-}
-
 // AddMember adds an user to a room
 func (r *Room) AddMember(user *User) error {
 	r.mu.Lock()
@@ -105,9 +90,27 @@ func (r *Room) AddMember(user *User) error {
 
 // RoomRepository defines the methods to interact with the room storage.
 type RoomRepository interface {
-	Store(ctx context.Context, room *Room) (*Room, error)
-	Update(ctx context.Context, room *Room) (*Room, error)
+	Store(ctx context.Context, room *Room) error
 	Delete(ctx context.Context, id int) error
 	FindById(ctx context.Context, id int) (*Room, error)
-	FindByInviteCode(ctx context.Context, inviteCode string) (*User, error)
+	FindByInviteCode(ctx context.Context, inviteCode string) (*Room, error)
+}
+
+// RoomService defines the application methods exposed by the rooms domain.
+type RoomService interface {
+	// Create creates a new room. Creating a room does not add the creator as
+	// a member by default.
+	Create(ctx context.Context, ownerId uint) (*Room, error)
+
+	// GetDetails returns room details by the invitation code.
+	GetDetails(ctx context.Context, invitationCode string) (*Room, error)
+
+	// Join adds a user to a room.
+	Join(ctx context.Context, roomId uint, joiningUserId uint) error
+
+	// Leave removes a user from the room.
+	Leave(ctx context.Context, roomId uint, leavingUserId uint) error
+
+	// IsResiding checks for if a particular user is a member of a room.
+	IsResiding(ctx context.Context, roomId uint, userId uint) bool
 }

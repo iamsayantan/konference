@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/iamsayantan/konference/room"
 	"github.com/iamsayantan/konference/server"
 	"github.com/iamsayantan/konference/user"
 	"gorm.io/driver/mysql"
@@ -25,7 +26,10 @@ func main() {
 	userRepo := mysqlSotrage.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)
 
-	s := server.NewServer(userService)
+	roomRepo := mysqlSotrage.NewRoomRepository(db)
+	roomService := room.NewRoomService(roomRepo, userService)
+
+	s := server.NewServer(userService, roomService)
 	err = http.ListenAndServe(fmt.Sprintf(":%s", "8000"), s)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("error starting the server: %s", err.Error()))

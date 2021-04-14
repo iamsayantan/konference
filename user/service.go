@@ -6,15 +6,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type userService struct {
+type userServiceImpl struct {
 	users konference.UserRepository
 }
 
 func NewUserService(repo konference.UserRepository) konference.UserService {
-	return &userService{users: repo}
+	return &userServiceImpl{users: repo}
 }
 
-func (us *userService) CreateUser(ctx context.Context, email, firstName, lastName, plaintextPassword string) error {
+func (us *userServiceImpl) CreateUser(ctx context.Context, email, firstName, lastName, plaintextPassword string) error {
 	existingUser, err := us.users.FindByEmail(ctx, email)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (us *userService) CreateUser(ctx context.Context, email, firstName, lastNam
 	return us.users.Store(ctx, user)
 }
 
-func (us *userService) Authenticate(ctx context.Context, email, plaintextPassword string) (*konference.User, error) {
+func (us *userServiceImpl) Authenticate(ctx context.Context, email, plaintextPassword string) (*konference.User, error) {
 	user, err := us.users.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (us *userService) Authenticate(ctx context.Context, email, plaintextPasswor
 	return user, nil
 }
 
-func (us *userService) GetUserDetails(ctx context.Context, userId uint) (*konference.User, error) {
+func (us *userServiceImpl) GetUserDetails(ctx context.Context, userId uint) (*konference.User, error) {
 	user, err := us.users.FindById(ctx, userId)
 	if err != nil {
 		return nil, err
