@@ -17,6 +17,9 @@ var (
 	// ErrAlreadyInRoom is returned when an already existing member of the room tries to join again.
 	ErrAlreadyInRoom = errors.New("user already in room")
 
+	// ErrUserNotInRoom is returned when an non existing member is being removed from a room.
+	ErrUserNotInRoom = errors.New("user does not belong to the room")
+
 	//ErrRoomCapacityFull is triggered when someone tries to join after the room reaches its capacity.
 	ErrRoomCapacityFull = errors.New("room capacity full")
 )
@@ -71,18 +74,41 @@ func (r *Room) IsFull() bool {
 	return r.MemberCount() >= MaxAllowedMembers
 }
 
+func (r *Room) GetMember(memberId uint) *User {
+	member, ok := r.members[memberId]
+	if ok {
+		return nil
+	}
+
+	return member
+}
+
 // AddMember adds an user to a room
-func (r *Room) AddMember(user *User) error {
+func (r *Room) AddMember(member *User) error {
 	r.mu.Lock()
 	if r.IsFull() {
 		return ErrRoomCapacityFull
 	}
 
-	if _, ok := r.members[user.ID]; ok {
+	if _, ok := r.members[member.ID]; ok {
 		return ErrAlreadyInRoom
 	}
 
-	r.members[user.ID] = user
+	r.members[member.ID] = member
+	r.mu.Unlock()
+
+	return nil
+}
+
+// RemoveMember removes a member from the room.
+// If the provided user is not found, then it is silently ignored.
+func (r *Room) RemoveMember(memberId uint) error {
+	r.mu.Lock()
+	if _, ok := r.members[memberId]; !ok {
+		return ErrUserNotInRoom
+	}
+
+	delete(r.members, memberId)
 	r.mu.Unlock()
 
 	return nil
@@ -91,8 +117,8 @@ func (r *Room) AddMember(user *User) error {
 // RoomRepository defines the methods to interact with the room storage.
 type RoomRepository interface {
 	Store(ctx context.Context, room *Room) error
-	Delete(ctx context.Context, id int) error
-	FindById(ctx context.Context, id int) (*Room, error)
+	Delete(ctx context.Context, id uint) error
+	FindById(ctx context.Context, id uint) (*Room, error)
 	FindByInviteCode(ctx context.Context, inviteCode string) (*Room, error)
 }
 

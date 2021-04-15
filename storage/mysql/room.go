@@ -20,11 +20,11 @@ func (r *roomRepo) Store(ctx context.Context, room *konference.Room) error {
 	return r.db.WithContext(ctx).Create(&room).Error
 }
 
-func (r *roomRepo) Delete(ctx context.Context, id int) error {
+func (r *roomRepo) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&konference.Room{}, id).Error
 }
 
-func (r *roomRepo) FindById(ctx context.Context, id int) (*konference.Room, error) {
+func (r *roomRepo) FindById(ctx context.Context, id uint) (*konference.Room, error) {
 	return r.findByField(ctx, "id", id)
 }
 
