@@ -34,7 +34,7 @@ func (r *roomRepo) FindByInviteCode(ctx context.Context, inviteCode string) (*ko
 
 func (r *roomRepo) findByField(ctx context.Context, fieldName string, fieldValue interface{}) (*konference.Room, error) {
 	var room konference.Room
-	err := r.db.WithContext(ctx).Where(
+	err := r.db.WithContext(ctx).Preload("CreatedBy").Where(
 		fmt.Sprintf("%s = ?", fieldName),
 		fieldValue,
 	).First(&room).Error

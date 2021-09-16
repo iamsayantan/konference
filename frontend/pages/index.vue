@@ -26,20 +26,20 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Room } from '~/types/room'
+import { RoomCreateResponse } from '~/types/room'
 
 @Component({
   name: 'IndexPage',
   middleware: 'auth'
 })
-export default class IndexPage extends Vue{
-  loading: boolean = false
+export default class IndexPage extends Vue {
+  loading: boolean = false;
 
   async createRoom() {
-    this.loading = true
+    this.loading = true;
     try {
-      const resp = await this.$axios.post<Room>('/rooms/v1')
-      console.log('RoomDetails', resp.data)
+      const resp = await this.$axios.post<RoomCreateResponse>('/rooms/v1');
+      await this.$router.push(`/r/${resp.data.data?.room_details.invite_code}`);
     } catch (e) {
       console.error(e)
     }
