@@ -16,7 +16,7 @@
             align-center
         >
           <div style="margin-top: 10px">
-            <v-btn color="teal" dark large block outlined>Create Room</v-btn>
+            <v-btn :loading="loading" color="teal" dark large block outlined @click="createRoom">Create Room</v-btn>
           </div>
         </v-layout>
       </v-row>
@@ -24,14 +24,26 @@
   </v-container>
 </template>
 
-<script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { Room } from '~/types/room'
 
-export default {
-  components: {
-    Logo,
-    VuetifyLogo,
-  },
+@Component({
+  name: 'IndexPage',
+  middleware: 'auth'
+})
+export default class IndexPage extends Vue{
+  loading: boolean = false
+
+  async createRoom() {
+    this.loading = true
+    try {
+      const resp = await this.$axios.post<Room>('/rooms/v1')
+      console.log('RoomDetails', resp.data)
+    } catch (e) {
+      console.error(e)
+    }
+    this.loading = false
+  }
 }
 </script>

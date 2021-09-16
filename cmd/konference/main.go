@@ -22,6 +22,7 @@ func main() {
 	}
 
 	err = db.AutoMigrate(&konference.User{})
+	err = db.AutoMigrate(&konference.Room{})
 
 	userRepo := mysqlSotrage.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)

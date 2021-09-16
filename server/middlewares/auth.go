@@ -12,7 +12,7 @@ import (
 type contextKey int
 
 const (
-	KeyAuthUserID = 0
+	keyAuthUserID = 0
 )
 
 func AuthChecker(next http.Handler) http.Handler {
@@ -49,7 +49,13 @@ func AuthChecker(next http.Handler) http.Handler {
 		}
 
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, KeyAuthUserID, jwtTokenClaims.UserID)
+		ctx = context.WithValue(ctx, keyAuthUserID, jwtTokenClaims.UserID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+// GetAuthenticatedUserIdFromContext is used to get the id of the authenticated user from the context. This method
+// should only be called from handlers which is protected by the AuthChecker middleware.
+func GetAuthenticatedUserIdFromContext(ctx context.Context) uint {
+	return ctx.Value(keyAuthUserID).(uint)
 }

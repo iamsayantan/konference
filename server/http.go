@@ -46,6 +46,11 @@ func NewServer(us konference.UserService, rs konference.RoomService) *Server {
 		r.Mount("/v1", uh.Routes())
 	})
 
+	r.Route("/rooms", func(r chi.Router) {
+		rh := handlers.NewRoomHandler(s.RoomService)
+		r.Mount("/v1", rh.Routes())
+	})
+
 	r.Get("/", HelloHandler)
 	r.NotFound(notFoundHandler)
 	r.MethodNotAllowed(methodNotAllowedHandler)

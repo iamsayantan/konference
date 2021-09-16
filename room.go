@@ -3,10 +3,8 @@ package konference
 import (
 	"context"
 	"errors"
-	"math/rand"
-	"strconv"
+	"github.com/bwmarrin/snowflake"
 	"sync"
-	"time"
 )
 
 // MaxAllowedMembers is the maximum number that we allow per room.
@@ -14,6 +12,8 @@ const MaxAllowedMembers = 4
 const invitationCodeBlockLength = 9999
 
 var (
+	idGenerator *snowflake.Node
+
 	// ErrAlreadyInRoom is returned when an already existing member of the room tries to join again.
 	ErrAlreadyInRoom = errors.New("user already in room")
 
@@ -24,19 +24,29 @@ var (
 	ErrRoomCapacityFull = errors.New("room capacity full")
 )
 
+func init() {
+	var err error
+	idGenerator, err = snowflake.NewNode(1)
+
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
 // generateInviteCode generates a random invite code for rooms.
 func generateInviteCode(blockLength int) string {
-	rand.Seed(time.Now().UnixNano())
+	return idGenerator.Generate().String()
+	//rand.Seed(time.Now().UnixNano())
 	// format 9999-3343-3439
-	return strconv.Itoa(rand.Intn(blockLength)) + "-" + strconv.Itoa(rand.Intn(blockLength)) + "-" + strconv.Itoa(rand.Intn(blockLength))
+	//return strconv.Itoa(rand.Intn(blockLength)) + "-" + strconv.Itoa(rand.Intn(blockLength)) + "-" + strconv.Itoa(rand.Intn(blockLength))
 }
 
 // Room is the place where a call takes place.
 type Room struct {
 	ID         uint   `json:"id"`
-	InviteCode string `json:"inviteCode"`
-	OwnerID    uint
-	CreatedBy  *User `json:"createdBy" gorm:"foreignKey:OwnerID"`
+	InviteCode string `json:"invite_code"`
+	OwnerID    uint   `json:"-"`
+	CreatedBy  *User  `json:"created_by" gorm:"foreignKey:OwnerID"`
 
 	members map[uint]*User
 	mu      sync.Mutex

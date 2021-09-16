@@ -66,12 +66,12 @@ export default {
         endpoints: {
           login: { url: '/users/v1/login', method: 'post' },
           user: { url: '/users/v1/me', method: 'get' },
-        },
-        redirect: {
-          login: false,
-          home: '/'
         }
       }
+    },
+    redirect: {
+      login: '/auth/login',
+      home: '/'
     }
   },
 

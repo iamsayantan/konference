@@ -103,7 +103,7 @@ func (u *userHandler) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *userHandler) me(w http.ResponseWriter, r *http.Request) {
-	loggedInUserID, _ := r.Context().Value(middlewares.KeyAuthUserID).(uint)
+	loggedInUserID := middlewares.GetAuthenticatedUserIdFromContext(r.Context())
 	user, err := u.service.GetUserDetails(r.Context(), loggedInUserID)
 
 	if err != nil {
