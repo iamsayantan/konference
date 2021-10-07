@@ -39,7 +39,7 @@ export default class IndexPage extends Vue {
     this.loading = true;
     try {
       const resp = await this.$axios.post<RoomCreateResponse>('/rooms/v1');
-      await this.$router.push(`/r/${resp.data.data?.room_details.invite_code}`);
+      await this.$router.push(`/r/${resp.data.data?.room_details.id}`);
     } catch (e) {
       console.error(e)
     }

@@ -3,7 +3,6 @@ import {SuccessResponse} from "~/types/response";
 
 export interface Room {
   id: number
-  invite_code: string
   created_by: User
 }
 

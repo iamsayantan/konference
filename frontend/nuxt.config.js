@@ -55,7 +55,7 @@ export default {
     strategies: {
       local: {
         token: {
-          property: 'data.access_token',
+          property: 'data.accessToken',
           required: true,
           type: ''
         },

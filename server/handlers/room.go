@@ -35,6 +35,11 @@ func (rh *roomHandler) createRoom(w http.ResponseWriter, r *http.Request) {
 	rendering.RenderSuccessWithData(w, r, "success", http.StatusCreated, resp)
 }
 
+//func (rh *roomHandler) findByCode(w http.ResponseWriter, r *http.Request) {
+//	roomCode := chi.URLParam(r, "inviteCode")
+//	room := rh.service.GetDetails()
+//}
+
 func NewRoomHandler(s konference.RoomService) Handler {
 	return &roomHandler{service: s}
 }

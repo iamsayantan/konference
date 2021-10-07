@@ -6,14 +6,14 @@
   >
     <div style="margin-top: 20px; width: 90%">
       <v-text-field
-        v-model="registrationData.first_name"
+        v-model="registrationData.firstName"
         outlined
         name="first_name"
         label="First Name"
         required
       ></v-text-field>
       <v-text-field
-          v-model="registrationData.last_name"
+          v-model="registrationData.lastName"
           outlined
           name="last_name"
           label="Last Name"
@@ -64,12 +64,12 @@ export default class RegistrationPage extends Vue {
   async handleRegistration() {
     const registrationData = this.registrationData;
 
-    if (!registrationData.first_name) {
+    if (!registrationData.firstName) {
       this.$toast.show('First name is required');
       return;
     }
 
-    if (!registrationData.last_name) {
+    if (!registrationData.lastName) {
       this.$toast.show('Last name is required');
       return;
     }

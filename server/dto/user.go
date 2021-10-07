@@ -7,8 +7,8 @@ import (
 )
 
 type RegistrationRequest struct {
-	FirstName string `json:"first_name" validate:"required,max=191"`
-	LastName  string `json:"last_name" validate:"required,max=191"`
+	FirstName string `json:"firstName" validate:"required,max=191"`
+	LastName  string `json:"lastName" validate:"required,max=191"`
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=8"`
 }
@@ -40,11 +40,11 @@ func (lr *LoginRequest) Validate() map[string]string {
 
 type LoginResponse struct {
 	User        konference.User `json:"user"`
-	AccessToken string          `json:"access_token"`
+	AccessToken string          `json:"accessToken"`
 }
 
 // UserClaims struct holds the data that would be encoded to a jwt.
 type UserClaims struct {
-	UserID uint `json:"user_id"`
+	UserID uint `json:"userId"`
 	jwt.StandardClaims
 }

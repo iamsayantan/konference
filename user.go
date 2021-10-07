@@ -17,8 +17,8 @@ var (
 type User struct {
 	ID        uint      `json:"id" gorm:"primarykey"`
 	Email     string    `json:"email" gorm:"unique"`
-	FirstName string    `json:"first_name" gorm:"size:191"`
-	LastName  string    `json:"last_name" gorm:"size:191"`
+	FirstName string    `json:"firstName" gorm:"size:191"`
+	LastName  string    `json:"lastName" gorm:"size:191"`
 	Password  string    `json:"-" gorm:"size:255"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`

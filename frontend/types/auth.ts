@@ -7,15 +7,15 @@ export interface LoginRequest {
 }
 
 export interface RegistrationRequest {
-  first_name: string,
-  last_name: string,
+  firstName: string,
+  lastName: string,
   email: string,
   password: string
 }
 
 export interface LoginResponseData {
   user: User,
-  access_token: string
+  accessToken: string
 }
 
 export interface RegistrationResponse extends SuccessResponse <null> {
